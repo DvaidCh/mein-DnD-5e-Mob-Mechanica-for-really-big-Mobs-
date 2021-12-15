@@ -124,7 +124,7 @@
 			var MobSize=eval(itm.querySelector("#count").value);
 			var takenDamage=eval( itm.querySelector("#takendamage").value);
 			var standartHP=eval( itm.querySelector("#maxhp").value);
-			var alive=Math.ceil((MobSize*standartHP-takenDamage)/MobSize);
+			var alive=Math.ceil((MobSize*standartHP-takenDamage)/standartHP);
 			if(alive<=0){itm.classList.add("dead");alive=0;}else{itm.classList.remove("dead");}
 
 			return alive;
