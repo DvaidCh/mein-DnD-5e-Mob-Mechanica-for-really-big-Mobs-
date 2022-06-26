@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+	 <meta charset="utf-8">
+	<title></title>
+	<style type="text/css">
+		
+		input{
+			display: inline-block;
+			width: 5%;
+		}
+		*{font-size: 15pt}
+		.outp{
+			background: red;
+			border:6pt ridge darkred;
+			width: 60pt; 
+			display: inline-block;
+			background: linear-gradient(0.35turn,gray,#DE3163 50%,#641E16 90%,#E6B0AA 100%);
+			color:white;
+			font-weight: bold;
+			 
+		}
+		#takendamage{
+			width: 10%;
+		}
+		#accuracy , #damage {
+			width:15%;
+		}
+		#name{
+			width: 25%;
+		}
+		.obj{
+			background: linear-gradient(0.35turn,gray,#DE3163 50%,#641E16 90%,#E6B0AA 100%);
+			padding: 15pt;
+			margin-top:6pt;
+			border:6pt ridge #E6B0AA;
+		}
+		.bttn{
+			font-weight: normal;
+			width: 20pt;
+			-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
+		}
+		.outp:active{
+			background: white;
+			color:#E6B0AA;
+		}
+		#target input{
+			width: 45%;
+		}
+		.Alert{width:100vw;word-wrap:break-word;background: linear-gradient(0turn,gray,wheat 50%,lightblue 90%,wheat 100%);}
+		
+		.dead{
+			background: linear-gradient(0.25turn,black,red 45%,red 50%, red 55%, black 100%);
+		}
+	</style>
+	<script type="text/javascript">
+		function dice(power,count){
+			if(count==undefined)count=1;
+			return Math.floor((Math.random()*(power-1)+1)*count);
+		}
+		d=dice;
+		clonecounter=0;
+		function cloneMob(data){
+
+			var clone=document.getElementById("objexampl").cloneNode(true);
+			clone.Mob={};
+				clone.style=null;
+				clone.id="Mob"+clonecounter;
+				clonecounter++;
+				
+				if(data!=undefined){
+					for(var prop in data){
+						clone.Mob[prop]=data[prop];
+						clone.querySelector("#"+prop).value=data[prop];
+
+					}
+					onchng(clone);
+				}
+				document.getElementById("objs").append(clone);
+		}
+		function onchng(itm){
+
+			var parent=itm.querySelector("#inputs");
+			var emptyness=parent.childElementCount;
+			[].forEach.call(parent.children,
+					function(curritm){
+						
+						if (curritm&&curritm.value)emptyness--;
+					}
+				)
+			
+			if(emptyness==parent.childElementCount && document.getElementById("objs").lastElementChild!=parent.parentNode)parent.parentNode.remove();
+			if(emptyness>0&&emptyness<parent.childElementCount&&document.getElementById("objs").lastElementChild==parent.parentNode){cloneMob();
+			}
+			
+			itm.querySelector("#count_of_alives").innerHTML=getCountOfAlives(itm);
+			var attack_count1=getAttackCount(itm);
+			var attack_count2=getAttackCount(itm);
+			var sum_damage1=getDamage(itm,attack_count1);
+			var sum_damage2=getDamage(itm,attack_count2);
+			itm.querySelector("#count_of_attacks1").innerHTML=attack_count1;
+			itm.querySelector("#count_of_attacks2").innerHTML=attack_count2;
+			itm.querySelector("#sum_damage1").innerHTML=sum_damage1;
+			itm.querySelector("#sum_damage2").innerHTML=sum_damage2;
+			
+		}
+		function getAttackCount(itm){
+
+			var attackersCount=itm.querySelector("#count_of_alives").innerHTML;
+			
+			var accuracy=Math.floor(eval(itm.querySelector("#accuracy").value));
+
+			var attcount =Math.floor( accuracy*attackersCount/eval(targetAC.value));
+				
+			if (attcount>attackersCount) {attcount=attackersCount;}
+			
+			return attcount;
+		}
+		function getDamage(itm,attack_count){
+			var damage=Math.floor(eval(itm.querySelector("#damage").value));
+			return damage*attack_count;
+		}
+		function getCountOfAlives(itm){
+			var MobSize=eval(itm.querySelector("#count").value);
+			var takenDamage=eval( itm.querySelector("#takendamage").value);
+			var standartHP=eval( itm.querySelector("#maxhp").value);
+			var alive=Math.ceil((MobSize*standartHP-takenDamage)/standartHP);
+			if(alive<=0){itm.classList.add("dead");alive=0;}else{itm.classList.remove("dead");}
+
+			return alive;
+		}
+		function Alert(text,id){
+			var alertum = document.querySelector("#"+id+".Alert");
+			console.log(alertum);
+			if(alertum!=undefined){
+			alertum.remove();
+			};{
+			var el= document.createElement('div');
+			el.classList.add("Alert");
+			el.id=id;
+			el.innerHTML="<p>"+text+"</p>";
+			var delelem=document.createElement('div');
+			delelem.classList.add('outp');
+			delelem.classList.add('bttn');
+			delelem.onclick=function(){this.parentNode.remove();};
+			delelem.innerHTML="❌"
+			el.append(delelem);
+			document.body.appendChild(el);}}
+
+	</script>
+</head>
+<body>
+<div id="objexampl" class="obj" style="display: none" >
+
+		<div id="inputs">
+ 		<input type="text" id="name" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="имя" title="имя"/>
+ 		<input type="text" id="count" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="количество"  title="количество"/>
+ 		<input type="text" id="AC" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="КД"  title="класс доспеха"/>
+ 		<input type="text" id="maxhp" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="максХП"  title="максимумХП"/>
+ 		<input type="text" id="damage" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="урон"  title="урон"/>
+ 		<input type="text" id="accuracy" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="ппдание(10+бнс)"  title="попадание(10+бонус)"/>
+ 		<input type="text" id="takendamage" onchange="onchng(this.parentNode.parentNode);this.parentNode.parentNode.Mob[this.id]=this.value" placeholder="отхвачено" title="отхвачено"/>
+ 		
+ 	</div>
+ 	<div id="outps">
+ 	<div class="outp" id="count_of_attacks1" ondblclick="this.innerHTML=getAttackCount(this.parentNode.parentNode); this.parentNode.parentNode.querySelector('#sum_damage1').innerHTML=getDamage(this.parentNode.parentNode,this.innerHTML);" title="количество атак 1"> </div>
+ 	<div class="outp" id="count_of_attacks2" ondblclick="this.innerHTML=getAttackCount(this.parentNode.parentNode); this.parentNode.parentNode.querySelector('#sum_damage2').innerHTML=getDamage(this.parentNode.parentNode,this.innerHTML);" title="количество атак 2"> </div>
+	<div class="outp" id="sum_damage1" ondblclick="this.innerHTML=getDamage(this.parentNode.parentNode,this.parentNode.querySelector('#count_of_attacks1').innerHTML)" title="суммарный урон 1"> </div>
+	<div class="outp" id="sum_damage2" ondblclick="this.innerHTML=getDamage(this.parentNode.parentNode,this.parentNode.querySelector('#count_of_attacks2').innerHTML)"  title="суммарный урон 2"> </div>
+	<div class="outp" id="count_of_alives" ondblclick="this.innerHTML=getCountOfAlives(this.parentNode.parentNode)" title="количество живых"> </div>
+	
+	<div class="outp bttn" id="reroll" title="reroll all" onclick="onchng(this.parentNode.parentNode)">🎲</div>
+	<div class="outp bttn" id="delete" title="delete" onclick="if(document.getElementById('objs').lastElementChild!=this.parentNode.parentNode)	this.parentNode.parentNode.remove();">❌</div>
+	<div class="outp bttn" title="Save" onclick="Alert(JSON.stringify(this.parentNode.parentNode),this.parentNode.parentNode.id)">📃</div>
+	</div> 
+ </div>
+<div id="target" class="obj" style="background: linear-gradient(0.90turn,gray,green 50%,lightgreen 90%,darkgreen 100%);">
+		<div class="outp bttn" title="Load" onclick="cloneMob(JSON.parse(prompt('введи ясона')).Mob)">📃</div>
+ 		<input type="text" id="targetAC" placeholder="КД"  title="класс доспеха"/>
+ 		
+</div>
+<div id="objs">
+
+
+
+ </div>
+ <script type="text/javascript">
+targetCount=document.getElementById("targetCount");
+targetAC=document.getElementById("targetAC");
+				cloneMob();
+</script>
+</body>
+</html>
